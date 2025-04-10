@@ -1,13 +1,15 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-const RegisterPage = () => {
+const Register = ({ setToken }) => {
   const [formData, setFormData] = useState({
+    name: "",
     email: "",
     password: "",
-    confirmPassword: "",
   });
 
   const [message, setMessage] = useState("");
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -15,9 +17,9 @@ const RegisterPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const { email, password, confirmPassword } = formData;
+    const { name, email, password } = formData;
 
-    if (!email || !password || !confirmPassword) {
+    if (!name || !email || !password) {
       setMessage("❌ Todos los campos son obligatorios.");
       return;
     }
@@ -27,18 +29,26 @@ const RegisterPage = () => {
       return;
     }
 
-    if (password !== confirmPassword) {
-      setMessage("❌ Las contraseñas no coinciden.");
-      return;
-    }
-
+    // Simulamos registro exitoso
     setMessage("✅ Registro exitoso.");
+    setToken(true);        // Activamos el token simulado
+    navigate("/profile");  // Redirigimos al perfil
   };
 
   return (
-    <div className="container mt-4">
-      <h2>Registro</h2>
+    <div className="container mt-4" style={{ maxWidth: "400px" }}>
+      <h2>Registro de Usuario</h2>
       <form onSubmit={handleSubmit}>
+        <div className="mb-3">
+          <label>Nombre:</label>
+          <input
+            type="text"
+            name="name"
+            className="form-control"
+            value={formData.name}
+            onChange={handleChange}
+          />
+        </div>
         <div className="mb-3">
           <label>Email:</label>
           <input
@@ -59,21 +69,11 @@ const RegisterPage = () => {
             onChange={handleChange}
           />
         </div>
-        <div className="mb-3">
-          <label>Confirmar Contraseña:</label>
-          <input
-            type="password"
-            name="confirmPassword"
-            className="form-control"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-          />
-        </div>
-        <button type="submit" className="btn btn-primary">Registrarse</button>
+        <button type="submit" className="btn btn-primary w-100">Registrarse</button>
       </form>
       {message && <p className="mt-3">{message}</p>}
     </div>
   );
 };
 
-export default RegisterPage;
+export default Register;

@@ -1,12 +1,14 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-const LoginPage = () => {
+const LoginPage = ({ setToken }) => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
 
   const [message, setMessage] = useState("");
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -27,6 +29,8 @@ const LoginPage = () => {
     }
 
     setMessage("✅ Inicio de sesión exitoso.");
+    setToken(true);        // Activa el token
+    navigate("/profile");  // Redirige al perfil
   };
 
   return (
