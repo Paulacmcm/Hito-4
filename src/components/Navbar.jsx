@@ -1,14 +1,15 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import formatPrice from "../utils/formatPrice";
+import { useCart } from "../context/CartContext"; // 👈 Importa el hook del contexto
 
 const Navbar = ({ token, setToken }) => {
-  const total = 25000;
+  const { getTotal } = useCart(); // 👈 Obtén el total desde el contexto
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    setToken(false); // "Cerrar sesión"
-    navigate("/");   // Redirige al inicio
+    setToken(false);
+    navigate("/");
   };
 
   return (
@@ -32,7 +33,7 @@ const Navbar = ({ token, setToken }) => {
           )}
 
           <Link className="btn btn-outline-dark" to="/cart">
-            🛒 Total: {formatPrice(total)}
+            🛒 Total: {formatPrice(getTotal())}
           </Link>
         </div>
       </div>
