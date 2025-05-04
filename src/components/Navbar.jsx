@@ -1,14 +1,16 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import formatPrice from "../utils/formatPrice";
-import { useCart } from "../context/CartContext"; // 👈 Importa el hook del contexto
+import { useCart } from "../context/CartContext";
+import { useUser } from "../context/UserContext"; // 👈 nuevo import
 
-const Navbar = ({ token, setToken }) => {
-  const { getTotal } = useCart(); // 👈 Obtén el total desde el contexto
+const Navbar = () => {
+  const { getTotal } = useCart();
+  const { token, logout } = useUser(); // 👈 usamos el contexto
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    setToken(false);
+    logout(); // 👈 usamos logout del contexto
     navigate("/");
   };
 

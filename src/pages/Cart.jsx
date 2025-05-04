@@ -1,8 +1,33 @@
 import { useCart } from "../context/CartContext";
 import formatPrice from "../utils/formatPrice";
+import { useUser } from "../context/UserContext";
 
 const Cart = () => {
   const { cart, increaseQuantity, decreaseQuantity, removeFromCart, getTotal } = useCart();
+  const { token } = useUser();
+
+  const handleCheckout = async () => {
+    try {
+      const res = await fetch("http://localhost:5000/api/checkouts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ cart }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alert("✅ Compra realizada con éxito.");
+      } else {
+        alert(`❌ Error: ${data.message}`);
+      }
+    } catch (error) {
+      alert("❌ Error al procesar la compra.");
+    }
+  };
 
   return (
     <div className="container mt-4">
@@ -38,6 +63,15 @@ const Cart = () => {
           <li className="list-group-item text-end fw-bold">
             Total: {formatPrice(getTotal())}
           </li>
+          <li className="list-group-item text-end">
+            <button
+              className="btn btn-primary"
+              disabled={!token}
+              onClick={handleCheckout}
+            >
+              Pagar
+            </button>
+          </li>
         </ul>
       ) : (
         <p className="text-muted">El carrito está vacío.</p>
@@ -47,4 +81,5 @@ const Cart = () => {
 };
 
 export default Cart;
+
 

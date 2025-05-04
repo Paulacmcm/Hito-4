@@ -1,38 +1,52 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
+import { useUser } from "../context/UserContext";
 
-const Register = ({ setToken }) => {
+const Register = () => {
+  const { token, register } = useUser();
   const [formData, setFormData] = useState({
-    name: "",
+    name: "", // ❗ aunque el backend no necesita "name", puedes mantenerlo para validación local
     email: "",
     password: "",
   });
 
   const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
+
+  if (token) {
+    return <Navigate to="/profile" replace />;
+  }
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const { name, email, password } = formData;
 
     if (!name || !email || !password) {
-      setMessage("❌ Todos los campos son obligatorios.");
+      setError("❌ Todos los campos son obligatorios.");
+      setMessage("");
       return;
     }
 
     if (password.length < 6) {
-      setMessage("❌ La contraseña debe tener al menos 6 caracteres.");
+      setError("❌ La contraseña debe tener al menos 6 caracteres.");
+      setMessage("");
       return;
     }
 
-    // Simulamos registro exitoso
-    setMessage("✅ Registro exitoso.");
-    setToken(true);        // Activamos el token simulado
-    navigate("/profile");  // Redirigimos al perfil
+    try {
+      await register(email, password); // ✅ Usamos el método real del contexto
+      setError("");
+      setMessage("✅ Registro exitoso.");
+      navigate("/profile");
+    } catch (err) {
+      setMessage("");
+      setError(`❌ ${err.message}`);
+    }
   };
 
   return (
@@ -71,7 +85,8 @@ const Register = ({ setToken }) => {
         </div>
         <button type="submit" className="btn btn-primary w-100">Registrarse</button>
       </form>
-      {message && <p className="mt-3">{message}</p>}
+      {message && <p className="mt-3 text-success">{message}</p>}
+      {error && <p className="mt-3 text-danger">{error}</p>}
     </div>
   );
 };

@@ -1,36 +1,47 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
+import { useUser } from "../context/UserContext";
 
-const LoginPage = ({ setToken }) => {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
-
+const LoginPage = () => {
+  const { token, login } = useUser();
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
+
+  if (token) {
+    return <Navigate to="/profile" replace />;
+  }
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const { email, password } = formData;
 
     if (!email || !password) {
-      setMessage("❌ Todos los campos son obligatorios.");
+      setMessage("");
+      setError("❌ Todos los campos son obligatorios.");
       return;
     }
 
     if (password.length < 6) {
-      setMessage("❌ La contraseña debe tener al menos 6 caracteres.");
+      setMessage("");
+      setError("❌ La contraseña debe tener al menos 6 caracteres.");
       return;
     }
 
-    setMessage("✅ Inicio de sesión exitoso.");
-    setToken(true);        // Activa el token
-    navigate("/profile");  // Redirige al perfil
+    try {
+      await login(email, password); // ✅ aquí pasas los datos al contexto
+      setError("");
+      setMessage("✅ Inicio de sesión exitoso.");
+      navigate("/profile");
+    } catch (err) {
+      setMessage("");
+      setError(`❌ ${err.message}`);
+    }
   };
 
   return (
@@ -59,7 +70,8 @@ const LoginPage = ({ setToken }) => {
         </div>
         <button type="submit" className="btn btn-success">Iniciar Sesión</button>
       </form>
-      {message && <p className="mt-3">{message}</p>}
+      {message && <p className="mt-3 text-success">{message}</p>}
+      {error && <p className="mt-3 text-danger">{error}</p>}
     </div>
   );
 };

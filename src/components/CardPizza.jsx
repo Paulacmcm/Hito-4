@@ -4,6 +4,8 @@ import formatPrice from "../utils/formatPrice";
 const CardPizza = ({ name, price, ingredients, img, id }) => {
   const { addToCart } = useCart(); // 👈 Obtenemos la función desde el contexto
 
+
+
   const handleViewMore = () => {
     alert(`Mostrando detalles de ${name}`);
     // Opcional: puedes redirigir a /pizza/${id} si ya usas rutas dinámicas
